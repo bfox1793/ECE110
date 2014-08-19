@@ -1,3 +1,13 @@
+/*Code for Demo Robot #1
+*Features:
+*Line following
+*Attempt to correct self when falling off line by backing up and shifting left
+*Also will beep if detected off line
+*Green LED - Driving straight
+*Yellow LED - Adjusting to stay on line
+*Red LED - Off the line entirely
+*/
+
 #include <Servo.h> 
 
 Servo servoLeft;
@@ -12,7 +22,7 @@ void setup()
   Serial.begin(9600);
   Serial.print("The program has started");
   servoLeft.attach(12); 
-  servoRight.attach(11);
+  servoRight.attach(13);
   servoLeft.writeMicroseconds(1500);
   servoRight.writeMicroseconds(1500);
   pinMode(greenLed, OUTPUT);
