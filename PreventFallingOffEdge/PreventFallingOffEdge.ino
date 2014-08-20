@@ -9,7 +9,11 @@ Servo servoLeft;
 Servo servoRight;
 
 const int bottomPingPin = 11;
-const int pingSensorDistanceConstant = 225;
+const int frontPingPin = 2;
+//const int redLedPin = 0;
+const int pingSensorGroundDistanceConstant = 225;
+const int pingSensorFrontDistanceConstant = 750;
+int frontObjectDetectionCount = 0;
 void setup()
 {
   Serial.begin(9600);
@@ -18,25 +22,53 @@ void setup()
   servoRight.attach(13);
   servoLeft.writeMicroseconds(1500);
   servoRight.writeMicroseconds(1500);
-
+  //pinMode(redLedPin, OUTPUT);
 }
 
 void loop() {
-  long currentTime = readPingSensor(bottomPingPin);
-  if (currentTime > pingSensorDistanceConstant) {
-    servoLeft.writeMicroseconds(1500);
-    servoRight.writeMicroseconds(1502);//servo is slightly off center
+  //digitalWrite(redLedPin, LOW);
+  long bottomPingDistance = readPingSensor(bottomPingPin);
+  long frontPingDistance = readPingSensor(frontPingPin);
+  if (bottomPingDistance > pingSensorGroundDistanceConstant) {
+    standStill();
     delay(1000);
     avoidEdge();
   }
   
-  else {
-    goForward();
+  if (frontPingDistance < pingSensorFrontDistanceConstant) {
+    frontObjectDetectionCount++;
+    if (frontObjectDetectionCount > 2){
+      //digitalWrite(redLedPin, HIGH);
+      dance();
+      frontObjectDetectionCount=0;
+    }
+   // digitalWrite(redLedPin, LOW);
+    avoidEdge(); 
   }
+  
+  goForward();
+}
+
+void standStill(){
+  servoLeft.writeMicroseconds(1500);
+  servoRight.writeMicroseconds(1502);//servo is slightly off center
+  delay(10);
+  return;
+}
+
+void dance(){
+ goBackward();
+ delay(100);
+ goForward();
+ delay(100);
+ turnRight();
+ turnLeft();
+ return; 
 }
 
 void avoidEdge() {
  goBackward();
+ delay(500);
  turnRight();
  return; 
 }
@@ -51,13 +83,20 @@ void goForward(){
 void goBackward(){
  servoLeft.writeMicroseconds(1300);
  servoRight.writeMicroseconds(1700);
- delay(500);
+ delay(10);
  return; 
 }
 
 void turnRight() {
   servoLeft.writeMicroseconds(1300);
   servoRight.writeMicroseconds(1300);
+  delay(300);
+  return;
+}
+
+void turnLeft() {
+  servoLeft.writeMicroseconds(1700);
+  servoRight.writeMicroseconds(1700);
   delay(300);
   return;
 }
@@ -78,10 +117,6 @@ long readPingSensor(int pingPin){
   // The same pin is used to read the signal from the PING))): a HIGH
   // pulse whose duration is the time (in microseconds) from the sending
   // of the ping to the reception of its echo off of an object.
-  duration = pulseIn(pingPin, HIGH);
-  
-  Serial.println(duration);
-  
+  duration = pulseIn(pingPin, HIGH);  
   return duration;
-  
 }
