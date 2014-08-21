@@ -1,6 +1,9 @@
 /*Code for DEMO Bot 4
-*Robot moves forward until it notices it is falling off edge
-*Backs up and turns right if this happens
+*This robot makes use of the PING sensor
+*Robot will move forward constantly, unless its PING sensors are utilized
+*If robot detects an object in front of it, it will back up and turn slightly left
+*If this happens three times, the red LED will turn on, the robot will dance, and then it will back up
+*If the robot detects the ground in front of it is missing, it will pause, back up, and turn right
 */
 
 #include <Servo.h> 
@@ -9,10 +12,11 @@ Servo servoLeft;
 Servo servoRight;
 
 const int bottomPingPin = 11;
-const int frontPingPin = 2;
-//const int redLedPin = 0;
+const int frontPingPin = 3;
+const int redLedPin = 2;
 const int pingSensorGroundDistanceConstant = 225;
 const int pingSensorFrontDistanceConstant = 750;
+const int danceConstant = 3;
 int frontObjectDetectionCount = 0;
 void setup()
 {
@@ -22,13 +26,14 @@ void setup()
   servoRight.attach(13);
   servoLeft.writeMicroseconds(1500);
   servoRight.writeMicroseconds(1500);
-  //pinMode(redLedPin, OUTPUT);
+  pinMode(redLedPin, OUTPUT);
 }
 
 void loop() {
-  //digitalWrite(redLedPin, LOW);
+  digitalWrite(redLedPin, LOW);
   long bottomPingDistance = readPingSensor(bottomPingPin);
   long frontPingDistance = readPingSensor(frontPingPin);
+  
   if (bottomPingDistance > pingSensorGroundDistanceConstant) {
     standStill();
     delay(1000);
@@ -38,11 +43,11 @@ void loop() {
   if (frontPingDistance < pingSensorFrontDistanceConstant) {
     frontObjectDetectionCount++;
     if (frontObjectDetectionCount > 2){
-      //digitalWrite(redLedPin, HIGH);
+      digitalWrite(redLedPin, HIGH);
       dance();
       frontObjectDetectionCount=0;
     }
-   // digitalWrite(redLedPin, LOW);
+    digitalWrite(redLedPin, LOW);
     avoidEdge(); 
   }
   
@@ -61,8 +66,10 @@ void dance(){
  delay(100);
  goForward();
  delay(100);
- turnRight();
- turnLeft();
+ for (int i=0;i<danceConstant;i++){
+   turnRight();
+   turnLeft();
+ }
  return; 
 }
 
