@@ -1,3 +1,8 @@
+/*Code for Robot 3: Light Robot
+*When robot detects a normal amount of light, it will stand still
+*Darkness : robot turns left
+*Bright light: robot turns right
+*/
 #include <Servo.h> 
 
 Servo servoLeft;
@@ -19,7 +24,6 @@ void setup()
 void loop()
 {
   float voltageAmount = volts(A3);
-  Serial.println(voltageAmount);
   if (voltageAmount < voltageMinimum){
     turnLeft();
   }
@@ -43,20 +47,6 @@ void standStill(){
   servoLeft.writeMicroseconds(1500);
   servoRight.writeMicroseconds(1500);//servo is slightly off center
   return;
-}
-
-void goForward(){
- servoLeft.writeMicroseconds(1700);
- servoRight.writeMicroseconds(1300);
- delay(10);
- return; 
-}
-
-void goBackward(){
- servoLeft.writeMicroseconds(1300);
- servoRight.writeMicroseconds(1700);
- delay(10);
- return; 
 }
 
 void turnRight() {
